@@ -28,7 +28,7 @@ VALIDATE(){
         exit 1
     fi
     }
-    cp /tmp/mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOG_FILE
+    cp /tmp/mongo.repo /etc/yum.repos.d/mongod.repo &>>$LOG_FILE
     VALIDATE $? "copying mongo db repo"
 
     dnf install mongodb-org -y &>>$LOG_FILE
