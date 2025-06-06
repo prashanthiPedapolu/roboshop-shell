@@ -28,7 +28,7 @@ VALIDATE(){
         exit 1
     fi
     }
-    cp C:\Users\ammul\devops\shell-repo\shell-script\roboshop-shell\mongo.repo /etc/yum.repos.d/mongod.repo &>>$LOG_FILE
+    cp mongo.repo /etc/mongod.conf &>>$LOG_FILE
     VALIDATE $? "copying mongo db repo"
 
     dnf install mongodb-org -y &>>$LOG_FILE
@@ -40,7 +40,7 @@ VALIDATE(){
     systemctl start mongod &>>$LOG_FILE
     VALIDATE $? "starting mongod"
 
-    sed -i 's/127.0.0.0/0.0.0.0/g' /etc/mongod.conf &>>$LOG_FILE
+    sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mongod.conf &>>$LOG_FILE
     VALIDATE $? "changing bind ip in mongod.conf"
 
     systemctl restart mongod &>>$LOG_FILE
