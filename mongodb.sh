@@ -30,6 +30,10 @@ VALIDATE() {
   fi
 }
 
+# Download GPG key manually to bypass SSL issue
+curl -s -o /etc/pki/rpm-gpg/RPM-GPG-KEY-mongodb https://pgp.mongodb.com/server-6.0.asc
+VALIDATE $? "Downloading MongoDB GPG key"
+
 # Copy the repo file
 
 cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongodb.repo &>> $LOG_FILE
