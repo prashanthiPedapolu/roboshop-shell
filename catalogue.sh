@@ -66,3 +66,9 @@ VALIDATE() {
  systemctl restart catalogue &>> $LOG_FILE
  VALIDATE $? "Restarting catalogue service" &>> $LOG_FILE
 
+ cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongodb.repo &>> $LOG_FILE
+ dnf install mongodb-mongosh -y
+VALIDATE $? "Installing MongoDB client" &>> $LOG_FILE
+
+mongosh --host mongodb.mylearnings.site </app/db/master-data.js
+
