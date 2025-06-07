@@ -8,6 +8,7 @@ N="\e[0m"
 LOGS_FOLDER="/var/log/roboshopshell-log"
 SCRIPT_NAME=$(basename "$0" | cut -d "." -f1)
 LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log"
+SCRIPT_DIR=$PWD
 
 mkdir -p $LOGS_FOLDER
 echo "Script started and executed at: $(date)" &>> $LOG_FILE
@@ -31,15 +32,7 @@ VALIDATE() {
 
 # Copy the repo file
 
-tee /etc/yum.repos.d/mongod.repo &>> $LOG_FILE <<EOF
-[mongodb-org-6.0]
-name=MongoDB Repository
-baseurl=https://repo.mongodb.org/yum/redhat/8/mongodb-org/6.0/x86_64/
-gpgcheck=1
-enabled=1
-gpgkey=https://www.mongodb.org/static/pgp/server-6.0.asc
-EOF
-VALIDATE $? "Creating MongoDB repo file" &>> $LOG_FILE
+cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongodb.repo &>> $LOG_FILE
 VALIDATE $? "Copying MongoDB repo file"
 
 # Install MongoDB
