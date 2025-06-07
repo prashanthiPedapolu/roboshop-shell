@@ -29,46 +29,58 @@ VALIDATE() {
     exit 1
   fi
 }
- dnf module disable nodejs -y &>> $LOG_FILE
- VALIDATE $? "Disabling Node.js module" &>> $LOG_FILE
 
- dnf module enable nodejs:20 -y &>> $LOG_FILE
- VALIDATE $? "Enabling Node.js 20 module" &>> $LOG_FILE
+# Node.js setup
+dnf module disable nodejs -y &>> $LOG_FILE
+VALIDATE $? "Disabling Node.js module"
 
- dnf install nodejs -y &>> $LOG_FILE
- VALIDATE $? "Installing Node.js" &>> $LOG_FILE
+dnf module enable nodejs:20 -y &>> $LOG_FILE
+VALIDATE $? "Enabling Node.js 20 module"
 
- useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>> $LOG_FILE
- VALIDATE $? "Creating roboshop user" &>> $LOG_FILE
+dnf install nodejs -y &>> $LOG_FILE
+VALIDATE $? "Installing Node.js"
 
- mkdir -p /app
- VALIDATE $? "Creating /app directory" &>> $LOG_FILE
+# roboshop user creation
+id roboshop &>> $LOG_FILE
+if [ $? -ne 0 ]; then
+  useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>> $LOG_FILE
+  VALIDATE $? "Creating roboshop user"
+else
+  echo -e "roboshop user already exists ... $Y SKIPPING $N" | tee -a $LOG_FILE
+fi
 
- curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip 
- VALIDATE $? "Downloading catalogue application package" &>> $LOG_FILE
+# App setup
+mkdir -p /app
+VALIDATE $? "Creating /app directory"
 
- cd /app    
- unzip -o /tmp/catalogue.zip &>> $LOG_FILE  
- VALIDATE $? "Unzipping catalogue application package" &>> $LOG_FILE
+curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip &>> $LOG_FILE
+VALIDATE $? "Downloading catalogue application package"
 
- npm install &>> $LOG_FILE
- VALIDATE $? "Installing Node.js dependencies" &>> $LOG_FILE   
- 
- cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service &>> $LOG_FILE
- VALIDATE $? "Copying catalogue service file" &>> $LOG_FILE
+cd /app
+unzip -o /tmp/catalogue.zip &>> $LOG_FILE
+VALIDATE $? "Unzipping catalogue application package"
 
- systemctl daemon-reload &>> $LOG_FILE
- VALIDATE $? "Reloading systemd daemon" &>> $LOG_FILE
+npm install &>> $LOG_FILE
+VALIDATE $? "Installing Node.js dependencies"
 
- systemctl enable catalogue &>> $LOG_FILE
- VALIDATE $? "Enabling catalogue service" &>> $LOG_FILE
+cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service &>> $LOG_FILE
+VALIDATE $? "Copying catalogue service file"
 
- systemctl restart catalogue &>> $LOG_FILE
- VALIDATE $? "Restarting catalogue service" &>> $LOG_FILE
+systemctl daemon-reload &>> $LOG_FILE
+VALIDATE $? "Reloading systemd daemon"
 
- cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongodb.repo &>> $LOG_FILE
- dnf install mongodb-mongosh -y
-VALIDATE $? "Installing MongoDB client" &>> $LOG_FILE
+systemctl enable catalogue &>> $LOG_FILE
+VALIDATE $? "Enabling catalogue service"
 
-mongosh --host mongodb.mylearnings.site </app/db/master-data.js
+systemctl restart catalogue &>> $LOG_FILE
+VALIDATE $? "Restarting catalogue service"
 
+# MongoDB repo and schema
+cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongodb.repo &>> $LOG_FILE
+VALIDATE $? "Copying MongoDB repo file"
+
+dnf install mongodb-mongosh -y &>> $LOG_FILE
+VALIDATE $? "Installing MongoDB client"
+
+mongosh --host mongodb.mylearnings.site </app/db/master-data.js &>> $LOG_FILE
+VALIDATE $? "Loading MongoDB schema"
