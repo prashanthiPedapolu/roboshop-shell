@@ -30,7 +30,16 @@ VALIDATE() {
 }
 
 # Copy the repo file
-cp C:\Users\ammul\devops\shell-repo\roboshop-shell\mongo.repo /etc/yum.repos.d/mongod.repo &>> $LOG_FILE
+
+tee /etc/yum.repos.d/mongod.repo &>> $LOG_FILE <<EOF
+[mongodb-org-6.0]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/8/mongodb-org/6.0/x86_64/
+gpgcheck=1
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-6.0.asc
+EOF
+VALIDATE $? "Creating MongoDB repo file" &>> $LOG_FILE
 VALIDATE $? "Copying MongoDB repo file"
 
 # Install MongoDB
