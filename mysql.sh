@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 START_TIME=$(date +%s)
@@ -23,6 +24,8 @@ else
     echo "You are running with root access" | tee -a $LOG_FILE
 fi
 
+echo "Please enter root password to setup"
+read -s MYSQL_ROOT_PASSWORD
 
 # validate functions takes input as exit status, what command they tried to install
 VALIDATE(){
@@ -44,7 +47,7 @@ VALIDATE $? "Enabling MySQL"
 systemctl start mysqld   &>>$LOG_FILE
 VALIDATE $? "Starting MySQL"
 
-mysql_secure_installation --set-root-pass -pprashanthi &>>$LOG_FILE
+mysql_secure_installation --set-root-pass $MYSQL_ROOT_PASSWORD &>>$LOG_FILE
 VALIDATE $? "Setting MySQL root password"
 
 END_TIME=$(date +%s)
