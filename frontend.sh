@@ -63,3 +63,6 @@ cp $SCRIPT_DIR/nginx.conf /etc/nginx/nginx.conf
 VALIDATE $? "Copying nginx.conf"
 
 systemctl restart nginx 
+systemctl start nginx
+VALIDATE $? "Starting Nginx"
+
