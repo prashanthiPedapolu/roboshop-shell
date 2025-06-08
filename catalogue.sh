@@ -78,7 +78,7 @@ dnf install mongodb-mongosh -y &>>$LOG_FILE
 VALIDATE $? "Installing MongoDB Client"
 
 STATUS=$(mongosh --host mongodb.mylearnings.site --eval 'db.getMongo().getDBNames().indexOf("catalogue")')
-if [ $STATUS -lt 0 ]
+if [ "${STATUS:-0}" -lt 0 ]
 then
     mongosh --host mongodb.mylearnings.site </app/db/master-data.js &>>$LOG_FILE
     VALIDATE $? "Loading data into MongoDB"
