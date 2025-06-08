@@ -23,9 +23,6 @@ else
     echo "You are running with root access" | tee -a $LOG_FILE
 fi
 
-echo "Please enter root password to setup"
-read -s MYSQL_ROOT_PASSWORD
-
 # validate functions takes input as exit status, what command they tried to install
 VALIDATE(){
     if [ $1 -eq 0 ]
@@ -80,16 +77,16 @@ VALIDATE $? "Starting Shipping"
 dnf install mysql -y  &>>$LOG_FILE
 VALIDATE $? "Install MySQL"
 
-mysql -h mysql.mylearnings.site -u root -p$MYSQL_ROOT_PASSWORD -e 'use cities' &>>$LOG_FILE
+mysql -h mysql.mylearnings.site -u root -pprashanthi -e 'use cities' &>>$LOG_FILE
 if [ $? -ne 0 ]
 then
-   mysql -h mysql.mylearnings.site -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/schema.sql &>>$LOG_FILE
+   mysql -h mysql.mylearnings.site -uroot -pprashanthi < /app/db/schema.sql &>>$LOG_FILE
 VALIDATE $? "Importing schema.sql"
 
-mysql -h mysql.mylearnings.site -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/app-user.sql &>>$LOG_FILE
+mysql -h mysql.mylearnings.site -uroot -pprashanthi < /app/db/app-user.sql &>>$LOG_FILE
 VALIDATE $? "Importing app-user.sql"
 
-mysql -h mysql.mylearnings.site -uroot -p$MYSQL_ROOT_PASSWORD < /app/db/master-data.sql &>>$LOG_FILE
+mysql -h mysql.mylearnings.site -uroot -pprashanthi < /app/db/master-data.sql &>>$LOG_FILE
 VALIDATE $? "Importing master-data.sql"
 
 else
