@@ -63,5 +63,3 @@ cp $SCRIPT_DIR/nginx.conf /etc/nginx/nginx.conf
 VALIDATE $? "Copying nginx.conf"
 
 systemctl restart nginx 
-systemctl enable nginx &>>$LOG_FILE
-VALIDATE $? "Restarting nginx"
